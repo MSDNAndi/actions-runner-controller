@@ -21,11 +21,11 @@ import (
 )
 
 type Config struct {
-	ConfigureUrl   string          `json:"configure_url"`
+	ConfigureUrl string `json:"configure_url"`
 	// Repositories is an optional list of repository URLs to listen to.
 	// If provided, the listener will create/get scale sets for each repository and listen to all of them.
 	// This is mutually exclusive with ConfigureUrl (if Repositories is set, ConfigureUrl is ignored).
-	Repositories               []string        `json:"repositories,omitempty"`
+	Repositories   []string        `json:"repositories,omitempty"`
 	VaultType      vault.VaultType `json:"vault_type"`
 	VaultLookupKey string          `json:"vault_lookup_key"`
 	// If the VaultType is set to "azure_key_vault", this field must be populated.

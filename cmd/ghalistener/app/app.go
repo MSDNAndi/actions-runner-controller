@@ -72,7 +72,7 @@ func New(config config.Config) (*App, error) {
 	if config.IsMultiRepository() {
 		// Multi-repository mode
 		app.logger.Info("Initializing multi-repository mode", "repositories", len(config.Repositories))
-		
+
 		for _, repoUrl := range config.Repositories {
 			ghConfig, err := actions.ParseGitHubConfigFromURL(repoUrl)
 			if err != nil {
@@ -89,18 +89,18 @@ func New(config config.Config) (*App, error) {
 			if scaleSetName == "" {
 				scaleSetName = config.EphemeralRunnerSetName
 			}
-			
+
 			app.logger.Info("Getting or creating scale set", "repository", repoUrl, "scaleSetName", scaleSetName)
-			
+
 			scaleSet, err := actionsClient.GetRunnerScaleSet(context.Background(), 1, scaleSetName)
 			if err != nil {
 				// Try to create the scale set
 				app.logger.Info("Scale set not found, attempting to create", "repository", repoUrl, "scaleSetName", scaleSetName)
 				newScaleSet := &actions.RunnerScaleSet{
-					Name:           scaleSetName,
-					RunnerGroupId:  1,
-					Labels:         []actions.Label{{Type: "System", Name: "self-hosted"}},
-					RunnerSetting:  actions.RunnerSetting{},
+					Name:          scaleSetName,
+					RunnerGroupId: 1,
+					Labels:        []actions.Label{{Type: "System", Name: "self-hosted"}},
+					RunnerSetting: actions.RunnerSetting{},
 				}
 				scaleSet, err = actionsClient.CreateRunnerScaleSet(context.Background(), newScaleSet)
 				if err != nil {
@@ -140,10 +140,10 @@ func New(config config.Config) (*App, error) {
 			if err != nil {
 				return nil, fmt.Errorf("failed to create listener for %s: %w", repoUrl, err)
 			}
-			
+
 			app.listeners = append(app.listeners, listener)
 		}
-		
+
 		app.logger.Info("Multi-repository mode initialized", "listeners", len(app.listeners))
 	} else {
 		// Single repository mode (existing behavior)
