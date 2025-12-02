@@ -60,6 +60,16 @@ The following documentation is for the legacy autoscaling modes that continue to
 
 We welcome contributions from the community. For more details on contributing to the project (including requirements), please refer to "[Getting Started with Contributing](https://github.com/actions/actions-runner-controller/blob/master/CONTRIBUTING.md)."
 
+### GitHub Copilot Coding Agents
+
+This repository is configured with GitHub Copilot coding agent specifications to help with development tasks. These AI-powered agents provide specialized guidance for different aspects of the project:
+
+- **[Agent System Overview](/.github/agents/README.md)** - Complete guide to the agent system
+- **[Quick Start Guide](/.github/agents/QUICK_START.md)** - Get started with agents quickly
+- Specialized agents for Go, Kubernetes/Helm, Documentation, and Testing
+
+The agents help both human developers (as reference documentation) and AI assistants (as specifications for automated assistance) work effectively in the codebase.
+
 ## Troubleshooting
 
 We are very happy to help you with any issues you have. Please refer to the "[Troubleshooting](https://github.com/actions/actions-runner-controller/blob/master/TROUBLESHOOTING.md)" section for common issues.
