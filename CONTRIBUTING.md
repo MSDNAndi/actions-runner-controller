@@ -30,6 +30,22 @@ Feel free to browse the [open issues](https://github.com/actions/actions-runner-
 By reading this guide, we hope to give you all of the information you need to be able to pick up issues, contribute new features, and get your work
 reviewed and merged.
 
+### GitHub Copilot Coding Agents
+
+To help you get started and work effectively in this codebase, we've configured specialized GitHub Copilot coding agents. These agents provide:
+
+- **Quick reference documentation** for different aspects of the project
+- **Best practices and conventions** specific to this repository
+- **AI-powered assistance** for common development tasks
+- **Domain expertise** in Go, Kubernetes, testing, and documentation
+
+**Start here:**
+- 📖 [Agent System Overview](/.github/agents/README.md) - Understand the agent architecture
+- 🚀 [Quick Start Guide](/.github/agents/QUICK_START.md) - Find what you need fast
+- 🎯 [Specialist Agents](/.github/agents/) - Deep dive into specific domains
+
+Even if you're not using GitHub Copilot, these agent specifications serve as excellent reference documentation for the project's conventions and best practices.
+
 ## Before contributing code
 
 We welcome code patches, but to make sure things are well coordinated you should discuss any significant change before starting the work. The maintainers ask that you signal your intention to contribute to the project using the issue tracker. If there is an existing issue that you want to work on, please let us know so we can get it assigned to you. If you noticed a bug or want to add a new feature, there are issue templates you can fill out.

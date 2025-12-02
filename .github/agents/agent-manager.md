@@ -11,6 +11,16 @@ A specialized sub-agent that monitors the effectiveness of the agent ecosystem, 
 - Monitoring agent effectiveness and utilization
 - Strategic planning for agent ecosystem evolution
 
+## Context
+This agent operates in the Actions Runner Controller repository, which is an active Kubernetes operator project with:
+- Multiple contributors with varying expertise levels
+- Evolving technology stack (Go, Kubernetes, Helm)
+- Both legacy and modern architecture patterns
+- Active issue tracking and PR review process
+- Regular releases and updates
+
+The agent ecosystem must remain aligned with the project's evolution while maintaining clarity and avoiding duplication.
+
 ## Core Responsibilities
 
 ### 1. Identify Need for New Agents
