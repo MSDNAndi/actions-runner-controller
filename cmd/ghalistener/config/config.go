@@ -22,6 +22,10 @@ import (
 
 type Config struct {
 	ConfigureUrl   string          `json:"configure_url"`
+	// Repositories is an optional list of repository URLs to listen to.
+	// If provided, the listener will create/get scale sets for each repository and listen to all of them.
+	// This is mutually exclusive with ConfigureUrl (if Repositories is set, ConfigureUrl is ignored).
+	Repositories               []string        `json:"repositories,omitempty"`
 	VaultType      vault.VaultType `json:"vault_type"`
 	VaultLookupKey string          `json:"vault_lookup_key"`
 	// If the VaultType is set to "azure_key_vault", this field must be populated.
@@ -100,16 +104,28 @@ func Read(ctx context.Context, configPath string) (*Config, error) {
 
 // Validate checks the configuration for errors.
 func (c *Config) Validate() error {
-	if len(c.ConfigureUrl) == 0 {
-		return fmt.Errorf("GitHubConfigUrl is not provided")
+	// If Repositories is provided, ConfigureUrl is not required
+	if len(c.Repositories) == 0 && len(c.ConfigureUrl) == 0 {
+		return fmt.Errorf("either GitHubConfigUrl or Repositories list must be provided")
+	}
+
+	// If Repositories is provided, validate each URL
+	if len(c.Repositories) > 0 {
+		for _, repo := range c.Repositories {
+			if len(repo) == 0 {
+				return fmt.Errorf("empty repository URL in Repositories list")
+			}
+		}
+		// When using Repositories, RunnerScaleSetId and ConfigureUrl are optional
+	} else {
+		// Single repository mode - require RunnerScaleSetId
+		if c.RunnerScaleSetId == 0 {
+			return fmt.Errorf(`RunnerScaleSetId "%d" is missing`, c.RunnerScaleSetId)
+		}
 	}
 
 	if len(c.EphemeralRunnerSetNamespace) == 0 || len(c.EphemeralRunnerSetName) == 0 {
 		return fmt.Errorf("EphemeralRunnerSetNamespace %q or EphemeralRunnerSetName %q is missing", c.EphemeralRunnerSetNamespace, c.EphemeralRunnerSetName)
-	}
-
-	if c.RunnerScaleSetId == 0 {
-		return fmt.Errorf(`RunnerScaleSetId "%d" is missing`, c.RunnerScaleSetId)
 	}
 
 	if c.MaxRunners < c.MinRunners {
@@ -151,6 +167,23 @@ func (c *Config) Logger() (logr.Logger, error) {
 	}
 
 	return logger, nil
+}
+
+// GetConfigureUrls returns the list of GitHub configuration URLs to listen to.
+// If Repositories is set, returns those URLs; otherwise returns ConfigureUrl as a single-element slice.
+func (c *Config) GetConfigureUrls() []string {
+	if len(c.Repositories) > 0 {
+		return c.Repositories
+	}
+	if len(c.ConfigureUrl) > 0 {
+		return []string{c.ConfigureUrl}
+	}
+	return []string{}
+}
+
+// IsMultiRepository returns true if the config specifies multiple repositories
+func (c *Config) IsMultiRepository() bool {
+	return len(c.Repositories) > 0
 }
 
 func (c *Config) ActionsClient(logger logr.Logger, clientOptions ...actions.ClientOption) (*actions.Client, error) {
@@ -198,6 +231,59 @@ func (c *Config) ActionsClient(logger logr.Logger, clientOptions ...actions.Clie
 		Version:    build.Version,
 		CommitSHA:  build.CommitSHA,
 		ScaleSetID: c.RunnerScaleSetId,
+		HasProxy:   hasProxy(),
+		Subsystem:  "ghalistener",
+	})
+
+	return client, nil
+}
+
+// ActionsClientForURL creates an actions client for a specific GitHub URL
+func (c *Config) ActionsClientForURL(configureUrl string, scaleSetId int, logger logr.Logger, clientOptions ...actions.ClientOption) (*actions.Client, error) {
+	var creds actions.ActionsAuth
+	switch c.Token {
+	case "":
+		creds.AppCreds = &actions.GitHubAppAuth{
+			AppID:             c.AppID,
+			AppInstallationID: c.AppInstallationID,
+			AppPrivateKey:     c.AppPrivateKey,
+		}
+	default:
+		creds.Token = c.Token
+	}
+
+	options := append([]actions.ClientOption{
+		actions.WithLogger(logger),
+	}, clientOptions...)
+
+	if c.ServerRootCA != "" {
+		systemPool, err := x509.SystemCertPool()
+		if err != nil {
+			return nil, fmt.Errorf("failed to load system cert pool: %w", err)
+		}
+		pool := systemPool.Clone()
+		ok := pool.AppendCertsFromPEM([]byte(c.ServerRootCA))
+		if !ok {
+			return nil, fmt.Errorf("failed to parse root certificate")
+		}
+
+		options = append(options, actions.WithRootCAs(pool))
+	}
+
+	proxyFunc := httpproxy.FromEnvironment().ProxyFunc()
+	options = append(options, actions.WithProxy(func(req *http.Request) (*url.URL, error) {
+		return proxyFunc(req.URL)
+	}))
+
+	client, err := actions.NewClient(configureUrl, &creds, options...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create actions client: %w", err)
+	}
+
+	client.SetUserAgent(actions.UserAgentInfo{
+		Version:    build.Version,
+		CommitSHA:  build.CommitSHA,
+		ScaleSetID: scaleSetId,
 		HasProxy:   hasProxy(),
 		Subsystem:  "ghalistener",
 	})
