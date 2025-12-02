@@ -36,6 +36,10 @@ For further information on what is supported by GitHub and what's managed by the
 
 ARC documentation is available on [docs.github.com](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners-with-actions-runner-controller/quickstart-for-actions-runner-controller).
 
+### Multi-Repository Listener Support
+
+The listener now supports listening to multiple repositories from a single listener pod, which is ideal for individual users or small teams with multiple repositories. See [Multi-Repository Listener Guide](/docs/multi-repository-listener.md) for configuration details.
+
 ### Legacy documentation
 
 The following documentation is for the legacy autoscaling modes that continue to be maintained by the community:
