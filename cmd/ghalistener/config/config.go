@@ -116,7 +116,11 @@ func (c *Config) Validate() error {
 				return fmt.Errorf("empty repository URL in Repositories list")
 			}
 		}
-		// When using Repositories, RunnerScaleSetId and ConfigureUrl are optional
+		// When using Repositories, RunnerScaleSetName should be provided
+		if len(c.RunnerScaleSetName) == 0 {
+			return fmt.Errorf("RunnerScaleSetName is required when using multi-repository mode")
+		}
+		// RunnerScaleSetId and ConfigureUrl are optional in multi-repo mode
 	} else {
 		// Single repository mode - require RunnerScaleSetId
 		if c.RunnerScaleSetId == 0 {

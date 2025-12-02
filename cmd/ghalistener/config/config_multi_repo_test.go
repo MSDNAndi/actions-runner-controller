@@ -151,4 +151,23 @@ func TestConfig_MultiRepository(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "RunnerScaleSetId")
 	})
+
+	t.Run("Validate requires RunnerScaleSetName in multi-repo mode", func(t *testing.T) {
+		config := &Config{
+			Repositories: []string{
+				"https://github.com/user/repo1",
+				"https://github.com/user/repo2",
+			},
+			AppConfig: &appconfig.AppConfig{
+				Token: "test-token",
+			},
+			EphemeralRunnerSetNamespace: "default",
+			EphemeralRunnerSetName:      "test",
+			// RunnerScaleSetName intentionally not set
+		}
+
+		err := config.Validate()
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "RunnerScaleSetName is required")
+	})
 }
