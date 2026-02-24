@@ -119,7 +119,7 @@ func TestConfigValidationConfigUrl(t *testing.T) {
 
 	err := config.Validate()
 
-	assert.ErrorContains(t, err, "GitHubConfigUrl is not provided", "Expected error about missing ConfigureUrl")
+	assert.ErrorContains(t, err, "either GitHubConfigUrl or Repositories list must be provided", "Expected error about missing ConfigureUrl or Repositories")
 }
 
 func TestConfigValidationWithVaultConfig(t *testing.T) {

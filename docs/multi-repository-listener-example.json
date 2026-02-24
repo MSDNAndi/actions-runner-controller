@@ -1,0 +1,15 @@
+{
+  "repositories": [
+    "https://github.com/myuser/repo1",
+    "https://github.com/myuser/repo2",
+    "https://github.com/myuser/repo3"
+  ],
+  "github_token": "ghp_yourPersonalAccessToken",
+  "ephemeral_runner_set_namespace": "default",
+  "ephemeral_runner_set_name": "multi-repo-runners",
+  "runner_scale_set_name": "multi-repo-scale-set",
+  "max_runners": 10,
+  "min_runners": 1,
+  "log_level": "info",
+  "log_format": "text"
+}
